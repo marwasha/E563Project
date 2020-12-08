@@ -1,4 +1,4 @@
-function eqns = grid_model(t,x,u,p)
+function eqns = grid_model(t,x,p)
 k = (-1)^(1/2);
 B12 = -imag(1/(1.2*k));
 B21 = B12;
@@ -6,12 +6,12 @@ B13 = -imag(1/(1*k));
 B31 = B13;
 B23 =  -imag(1/(0.8*k));
 B32 = B23;
-P1 = u(1); M1 = p(1); D1 = p(4);
-P2 = u(2); M2 = p(2); D2 = p(5);
-P3 = u(3); M3 = p(3); D3 = p(6);
-V1 = u(4);
-V2 = u(5);
-V3 = u(6);
+P1 = p(7); M1 = p(1); D1 = p(4);
+P2 = p(8); M2 = p(2); D2 = p(5);
+P3 = p(9); M3 = p(3); D3 = p(6);
+V1 = p(10);
+V2 = p(11);
+V3 = p(12);
 theta_1 = x(1);
 w_1 = x(2);
 theta_2 = x(3);
