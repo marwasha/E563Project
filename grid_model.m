@@ -12,24 +12,22 @@ P3 = u(3); M3 = p(3); D3 = p(6);
 V1 = u(4);
 V2 = u(5);
 V3 = u(6);
-theta_1 = x(1);
-w_1 = x(2);
-theta_2 = x(3);
-w_2 = x(4);
-theta_3 = x(5);
+
+theta_12 = x(1);
+theta_13 = x(2);
+theta_23 = x(3);
+w_1 = x(4);
+w_2 = x(5);
 w_3 = x(6);
 
-theta_1_dot = w_1;
-w_1_dot = (1/M1)*(P1-((V1*V2*B12*sin(theta_1-theta_2))+(V1*V3*B13*sin(theta_1-theta_3)))-D1*w_1);
-theta_2_dot = w_2;
-w_2_dot = (1/M2)*(P2-((V2*V1*B21*sin(theta_2-theta_1))+(V2*V3*B23*sin(theta_2-theta_3)))-D2*w_2);
-theta_3_dot = w_3;
-w_3_dot = (1/M3)*(P3-((V3*V1*B31*sin(theta_3-theta_1))+(V3*V2*B32*sin(theta_3-theta_2)))-D3*w_3);
+theta_12_dot = w_1 - w_2;
+theta_13_dot = w_1 - w_3;
+theta_23_dot = w_2 - w_3;
+w_1_dot = (1/M1)*(P1-((V1*V2*B12*sin(theta_12))+(V1*V3*B13*sin(theta_13)))-D1*w_1);
+w_2_dot = (1/M2)*(P2-((V2*V1*B21*sin(-theta_12))+(V2*V3*B23*sin(theta_23)))-D2*w_2);
+w_3_dot = (1/M3)*(P3-((V3*V1*B31*sin(-theta_13))+(V3*V2*B32*sin(-theta_23)))-D3*w_3);
 
-eqns = [theta_1_dot;w_1_dot;theta_2_dot;w_2_dot;theta_3_dot;w_3_dot];
-
-
-
+eqns = [theta_12_dot;theta_13_dot;theta_23_dot;w_1_dot;w_2_dot;w_3_dot];
 
 end
 

@@ -1,7 +1,8 @@
 function [dyn] = sym_gen_2()
 %% function to generate the symbolic expressions required by SQP algorithm using CasADi
 % addpath('E:\Program Files\MATLAB\CasADi')
-addpath('C:\Users\pwest\Downloads\DCC - cleaned code\DCC - cleaned code\casadi')
+%addpath('C:\Users\pwest\Downloads\DCC - cleaned code\DCC - cleaned code\casadi')
+addpath('ToolBoxes/casadi-windows-matlabR2016a-v3.5.5');
 import casadi.*;
 %% Create stage functions
 xk = SX.sym('xk',6);
