@@ -5,11 +5,11 @@ opts = odeset('RelTol',1e-6,'AbsTol',1e-8, 'Vectorized', 'off');
 x0_NL = [-.4691 -0.1236 0.3455 0 0 0]; 
 uStab = [-0.5,0.8,-0.3,1,1,1];
 uFault = [-0.5,0.0,-0.3,1,1,1];
-p = [0.5,1,1.2,0,0,0];
+p = [0.5,1,1.2,0.5,0.5,0.5];
 
 t_step = .001;
 t_fault = .004;
-totalSimTime = 2;
+totalSimTime = 200;
 steps = round(totalSimTime/t_step);
 stepFault = round(t_fault/t_step);
 
