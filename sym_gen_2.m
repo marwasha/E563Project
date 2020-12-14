@@ -1,18 +1,22 @@
 function [dyn] = sym_gen_2()
 %% function to generate the symbolic expressions required by SQP algorithm using CasADi
 % addpath('E:\Program Files\MATLAB\CasADi')
-addpath('C:\Users\pwest\Downloads\DCC - cleaned code\DCC - cleaned code\casadi')
+addpath('ToolBoxes\casadi-windows-matlabR2016a-v3.5.5')
 import casadi.*;
 %% Create stage functions
 xk = SX.sym('xk',6);
-par = SX.sym('par',12);
+uk = SX.sym('uk',6);
+par = SX.sym('par',6);
 % create fuel cell dynamics
-xdotk = grid_model(1, xk, par);
+xdotk = grid_model(1, xk, uk, par);
 
 A = jacobian(xdotk,xk);
+B = jacobian(xdotk,uk);
 % create casadi function for the discrete dynamicsA = Function('f_x',{xk, uk, par}, {A});
-A = Function('f_x',{xk, par}, {A});
+A = Function('f_x',{xk, uk, par}, {A});
+B = Function('f_x',{xk, uk, par}, {B});
 dyn.A = A;
+dyn.B = B;
 
 
 
