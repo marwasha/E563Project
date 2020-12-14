@@ -45,13 +45,14 @@ plot(x(:,1),x(:,2))
 
 % Check for P satisfying Lya
 dyn = sym_gen_single();
-A = full(dyn.A(X_0,p));
+A = full(dyn.A([SEP,0],p));
 
 P = sdpvar(2,2);
-Obj = [];
+gamma = sdpvar(1,1);
+Obj = [-gamma];
 eps = 10^-8;
 
-Consts = [P>= eps*eye(2), A'*P + P*A <= -eps*eye(2)];
+Consts = [P - gamma*eye(2)>= eps*eye(2), A'*P + P*A <= -eps*eye(2), gamma <= 10000];
 
 ops = sdpsettings('solver', 'sedumi');
 
@@ -65,6 +66,7 @@ else
  disp('May or may not be stable')
 end
 
+double(gamma)
 eig(Pval)
 end
 
