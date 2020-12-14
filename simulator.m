@@ -45,7 +45,7 @@ plot(x(:,1),x(:,2))
 
 % Check for P satisfying Lya
 dyn = sym_gen_single();
-A = full(dyn.A([SEP;0],p));
+A = full(dyn.A([0;-2],p));
 
 P = sdpvar(2,2);
 Obj = [];
