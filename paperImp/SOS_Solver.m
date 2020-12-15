@@ -15,10 +15,10 @@ fz = [z3 - z2*z3;
       z1*z3;
       (Pm-P_max*((z1*cos(SEP))+(1-z2)*sin(SEP))-D*z3)];
 
-p = z1^2 + z2^2 + 2.0*z3^2;
+p = z1^2 + z2^2 + z3^2;
 G1 = z1^2 + z2^2 - 2*z2;
 
-[Vz,coefsV,~] = polynomial(z,4,4); %Define Barrier function to be a 6th order polynomial
+[Vz,coefsV,~] = polynomial(z,2,2); %Define Barrier function to be a 6th order polynomial
 [s2,coefs_s2,~] = polynomial(z,2,2); % s2
 [s6,coefs_s6,~] = polynomial(z,2,2); % s6
 [L_1,coefs_L_1,~] = polynomial(z,2,2); % L1
