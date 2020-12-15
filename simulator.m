@@ -1,8 +1,7 @@
 function simulator(p)
-
 theta_eq = asin(p(1)/p(2));
 SEP = theta_eq;
-UEP = pi-theta_eq;
+UEP = pi-2*theta_eq;
 UEP_w = 0;
 tspan = 0:1:15;
 traj1 = [];
@@ -20,7 +19,7 @@ for k = 1:1:length(Initial)
     traj_2 = [];
     for i = 1:1:length(tspan)-1
         ts = [tspan(i) tspan(i+1)];
-        [t,x] = ode45(@(t,x)single_machine_model_backwards(t,x,p), ts, X_0);
+        [t,x] = ode45(@(t,x)single_machine_model_backwards(t,x,p,SEP), ts, X_0);
         X_0 = x(end,:);
         traj_2 = [traj_2;x];
     end
@@ -35,17 +34,17 @@ ylim([-4 3])
 xlabel('\theta (rad)')
 ylabel('\omega (rad/s)')
 hold on
-plot(SEP,0,'rx')
+plot(0,0,'rx')
 legend('Region of Attraction','Location','northeastoutside')
 hold on
 
 X_0 = [-1;-1];
-[t,x] = ode45(@(t,x)single_machine_model(t,x,p), [0 50], X_0);
+[t,x] = ode45(@(t,x)single_machine_model(t,x,p,SEP), [0 50], X_0);
 plot(x(:,1),x(:,2))
 
 % Check for P satisfying Lya
-dyn = sym_gen_single();
-A = full(dyn.A([SEP,0],p));
+dyn = sym_gen_single(SEP);
+A = full(dyn.A([0,0],p));
 
 P = sdpvar(2,2);
 gamma = sdpvar(1,1);

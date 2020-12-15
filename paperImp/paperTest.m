@@ -1,6 +1,6 @@
 %% Part 1
 clear all
-beta = .2;
+beta = .4;
 sdpvar z1 z2 z3 z4 z5 z6
 sdpvar e11 e12 e13 e14 e15 e16
 sdpvar e21 e22 e23 e24 e25 e26
@@ -51,7 +51,7 @@ solvesos(F,[],ops,[coefsV;coefs_s2;coefs_s6;coefs_Lam11;coefs_Lam21;coefs_Lam12;
 [lam_11,coefs_Lam11,~] = polynomial(z,1,0); % lamb11
 [lam_12,coefs_Lam12,~] = polynomial(z,1,0); % lamb12
 
-c = 8;
+c = 0.9;
 
 F = [sos((-s1*(c-Vz))-(s2*(p-beta))-((c-Vz)*(p-beta))-(lam_11*G1)-(lam_12*G2)-((p-beta)^2)), 
      sos(s1)];
@@ -73,9 +73,35 @@ F = [sos((-s1*(c-Vz))-(s2*(p-beta))-((c-Vz)*(p-beta))-(lam_11*G1)-(lam_12*G2)-((
                   + (Z(5)*Z(6)*value(coefsV(26))) + ((Z(6)^2)*value(coefsV(27)));
                   
 Lyap_input = @(X) [sin(X(1));1-cos(X(1));X(2);sin(X(3));1-cos(X(3));X(4)];
+p_input = @(Z) Z(1)^2 + Z(2)^2 + 2*Z(3)^2 + Z(4)^2 + Z(5)^2 + 2*Z(6)^2;
+%Plotting the heat Map for where V(z)<8 and the region of attraction is in
+%grey
+
 Test_point = [0,0,0,0];
 Lyap_func(Lyap_input(Test_point))
+p_input(Lyap_input(Test_point))
+X = [-3:0.1:3];
+Y = [-3:0.1:3];
 
+heatmaps = ones(length(X),length(Y));
+for k = 1:1:length(Y)
+    for j = 1:1:length(X)
+        Test_point = [X(j),0,Y(k),0]; 
+        value = Lyap_func(Lyap_input(Test_point));
+        p_value = p_input(Lyap_input(Test_point));
+        if beta-p_value>=0
+            heatmaps(k,j) = 0.5;
+        end
+        if value < c
+            heatmaps(k,j) = 0.2;
+        end
+        if (X(j) == -2.5) || (X(j) == 2.5)|| (Y(k) == 2.5)|| (Y(k) == -2.5)  %Boundary     
+            heatmaps(k,j) = 0;
+        end  
+    end
+end
+figure
+imshow(heatmaps)
  
  
  
