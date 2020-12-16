@@ -56,7 +56,7 @@ for i = 1:20
     [sol,u,Q] = solvesos(F,[],ops,[coefs_s1]);
 
     if sol.problem == 0
-        betaMin = gamma;
+        betaMin = beta;
     else
         betaMax = beta;
     end

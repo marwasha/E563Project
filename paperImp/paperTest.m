@@ -1,6 +1,7 @@
-%% Part 1
+%% Initalize V and beta
 clear all
 beta = .4;
+eps = 10^-8;
 sdpvar z1 z2 z3 z4 z5 z6
 sdpvar e11 e12 e13 e14 e15 e16
 sdpvar e21 e22 e23 e24 e25 e26
@@ -27,7 +28,7 @@ L2_coefs = coefficients(L_2,z);
 [lam_21,coefs_Lam21,~] = polynomial(z,1,0); % lamb21
 [lam_22,coefs_Lam22,~] = polynomial(z,1,0); % lamb21
 
-ops = sdpsettings('solver', 'sedumi');
+ops = sdpsettings('solver', 'sedumi', 'verbose', 0);
 
 dVz = jacobian(Vz,z); %derivatives
 eps = 10^-8;
@@ -40,69 +41,83 @@ F = [sos((-s2*(beta-p))+Vz-(lam_11*G1)-(lam_12*G2)-L_1),
      ];
 
  
-solvesos(F,[],ops,[coefsV;coefs_s2;coefs_s6;coefs_Lam11;coefs_Lam21;coefs_Lam12;coefs_Lam22;
-         L1_coefs;L2_coefs
-         ])
+solvesos(F,[],ops,[coefsV;coefs_s2;coefs_s6;coefs_Lam11;coefs_Lam21;
+                   coefs_Lam12;coefs_Lam22;L1_coefs;L2_coefs])
 
-%% Part 2
-% Region of Attraction Visualization (EQ.22 from the paper)
+%% Common
 
-[s1,coefs_s1,~] = polynomial(z,2,0); % s1
+[s6,coefs_s6,~] = polynomial(z,2,0); % s2
+[s8,coefs_s8,~] = polynomial(z,2,0); % s6
+[s9,coefs_s9,~] = polynomial(z,2,0); % s9
 [lam_11,coefs_Lam11,~] = polynomial(z,1,0); % lamb11
-[lam_12,coefs_Lam12,~] = polynomial(z,1,0); % lamb12
+[lam_12,coefs_Lam12,~] = polynomial(z,1,0); % lamb11
+[lam_21,coefs_Lam21,~] = polynomial(z,1,0); % lamb11
+[lam_22,coefs_Lam22,~] = polynomial(z,1,0); % lamb11
+[lam_31,coefs_Lam31,~] = polynomial(z,1,0); % lamb21
+[lam_32,coefs_Lam32,~] = polynomial(z,1,0); % lamb21
+     
+%% 1a MAX c
 
-c = 0.9;
+c_min = eps;
+c_max = 10;  
 
-F = [sos((-s1*(c-Vz))-(s2*(p-beta))-((c-Vz)*(p-beta))-(lam_11*G1)-(lam_12*G2)-((p-beta)^2)), 
-     sos(s1)];
- 
- solvesos(F,[],ops,[coefs_s1;coefs_Lam11;coefs_Lam12])
- 
- % Lyapunov functions as a matlab function
- Lyap_func = @(Z) (Z(1)*value(coefsV(1)))+(Z(2)*value(coefsV(2)))+(Z(3)*value(coefsV(3)))...
-                  +(Z(4)*value(coefsV(4)))+(Z(5)*value(coefsV(5))) +(Z(6)*value(coefsV(6)))...
-                  +((Z(1)^2)*value(coefsV(7)))+ (Z(1)*Z(2)*value(coefsV(8))) + ((Z(2)^2)*value(coefsV(9)))...
-                  + (Z(1)*Z(3)*value(coefsV(10))) + (Z(2)*Z(3)*value(coefsV(11)))...
-                  + ((Z(3)^2)*value(coefsV(12))) + (Z(1)*Z(4)*value(coefsV(13)))...
-                  + (Z(2)*Z(4)*value(coefsV(14))) + (Z(3)*Z(4)*value(coefsV(15)))...
-                  + ((Z(4)^2)*value(coefsV(16))) + (Z(1)*Z(5)*value(coefsV(17)))...
-                  + (Z(2)*Z(5)*value(coefsV(18))) + (Z(3)*Z(5)*value(coefsV(19)))...
-                  + (Z(4)*Z(5)*value(coefsV(20))) + ((Z(5)^2)*value(coefsV(21)))...
-                  + (Z(1)*Z(6)*value(coefsV(22))) + (Z(2)*Z(6)*value(coefsV(23)))...
-                  + (Z(3)*Z(6)*value(coefsV(24))) + (Z(4)*Z(6)*value(coefsV(25)))...
-                  + (Z(5)*Z(6)*value(coefsV(26))) + ((Z(6)^2)*value(coefsV(27)));
-                  
-Lyap_input = @(X) [sin(X(1));1-cos(X(1));X(2);sin(X(3));1-cos(X(3));X(4)];
-p_input = @(Z) Z(1)^2 + Z(2)^2 + 2*Z(3)^2 + Z(4)^2 + Z(5)^2 + 2*Z(6)^2;
-%Plotting the heat Map for where V(z)<8 and the region of attraction is in
-%grey
+i = 0;
+imax = 12;
 
-Test_point = [0,0,0,0];
-Lyap_func(Lyap_input(Test_point))
-p_input(Lyap_input(Test_point))
-X = [-3:0.1:3];
-Y = [-3:0.1:3];
-
-heatmaps = ones(length(X),length(Y));
-for k = 1:1:length(Y)
-    for j = 1:1:length(X)
-        Test_point = [X(j),0,Y(k),0]; 
-        value = Lyap_func(Lyap_input(Test_point));
-        p_value = p_input(Lyap_input(Test_point));
-        if beta-p_value>=0
-            heatmaps(k,j) = 0.5;
-        end
-        if value < c
-            heatmaps(k,j) = 0.2;
-        end
-        if (X(j) == -2.5) || (X(j) == 2.5)|| (Y(k) == 2.5)|| (Y(k) == -2.5)  %Boundary     
-            heatmaps(k,j) = 0;
-        end  
-    end
+while i < imax
+    c = (c_min+c_max)/2;
+    
+    F = [sos(s6),sos(s8),sos(s9),
+         sos(-s6*(beta-p) - (lam_21*G1)-(lam_22*G2) - (Vz-c)),
+         sos(-s8*(c-Vz) - s9*(dVz*fz) - (lam_31*G1)-(lam_32*G2) - L_2)];
+     
+     [sol,u,Q] = solvesos(F,[],ops,[coefs_s6;coefs_s8;coefs_s9;coefs_Lam21;coefs_Lam22;coefs_Lam31;coefs_Lam32]);
+     
+     if sol.problem == 0
+         c_min = c;
+     else
+         c_max = c;
+         if i == imax - 1
+             i = i - 1;
+         end
+     end
+     i = i+1;
 end
-figure
-imshow(heatmaps)
  
+%% 1b MAX beta
+
+beta_max = 10;
+beta_min = eps;
+
+j = 0; 
+jmax = 12;
+
+while j < jmax
+   beta = (beta_max+beta_min)/2; 
+    
+   F = [sos(s6),sos(s8),sos(s9),
+        sos(-s6*(beta-p) - (lam_21*G1)-(lam_22*G2) - (Vz-c)),
+        sos(-s8*(c-Vz) - s9*(dVz*fz) - (lam_31*G1)-(lam_32*G2) - L_2)];
+    
+    [sol,u,Q] = solvesos(F,[],ops,[coefs_s6;coefs_s8;coefs_s9;coefs_Lam21;coefs_Lam22;coefs_Lam31;coefs_Lam32]);
+     
+     if sol.problem == 0
+         beta_min = beta;
+     else
+         beta_max = beta;
+         if j == jmax - 1
+             j = j - 1;
+         end
+     end
+     j = j+1;
+   
+end
+
+%% 2a MIN c - STUCK
+
+F = [sos(Vz - (lam_11*G1)-(lam_12*G2) - L_1);
+     sos(-s6*(beta-p) - (lam_21*G1)-(lam_22*G2) - (Vz-c));
+     sos(-s8*(c-Vz) - s9*(dVz*fz) - (lam_31*G1)-(lam_32*G2) - L_2);
+     sos(s6)];
  
- 
- 
+ [sol,u,Q] = solvesos(F,[],ops,[coefsV;coefs_s6;coefs_Lam11;coefs_Lam12;coefs_Lam21;coefs_Lam22;coefs_Lam31;coefs_Lam32]);
